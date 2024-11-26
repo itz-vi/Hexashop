@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cart</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+
+<style>
+  body {
+    background-color: #e6dcdcce;
+    height: 100vh;
+    padding-bottom: 200px;
+  }
+
+
+  .navbar {
+    background-color: #ffffff;
+    height: 66px;
+    font-size: 22px;
+    padding: 0 52px;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.671);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .navbar a {
+    color: rgba(66, 75, 83, 0.798);
+    margin-left: 20px;
+    font-size: 25px;
+  }
+
+
+  thead {
+    background-color: rgb(10, 103, 190);
+    color: aliceblue;
+  }
+
+  .img {
+    border: 2px solid rgb(141, 202, 255);
+    border-radius: 5px;
+  }
+
+  table {
+    background-color: #fff;
+  }
+
+  .amt {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    font-size: 26px;
+  }
+
+  tbody td {
+    font-size: 20px;
+  }
+
+  .total {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    gap: 33px;
+  }
+
+  .purchase-btn {
+    padding: 7px 20px;
+    margin: 8px 33px;
+    font-size: 18px;
+    border: none;
+    background-color: #402aff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 20px;
+  }
+
+  .purchase-btn:focus {
+    border: none;
+  }
+
+  .links a {
+    margin-left: 30px;
+    font-size: 29px;
+    font-weight: 600;
+  }
+
+  .modal {
+    position: fixed;
+    top: 67%;
+    left: 50%;
+    width: 400px;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    z-index: 1000;
+    border-radius: 8px;
+  }
+
+  .modal-content {
+    text-align: center;
+  }
+
+  .modal button {
+    margin: 10px;
+  }
+
+  #modals {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.674);
+    display: none;
+    z-index: 999;
+  }
+
+  #modals.active {
+    display: block;
+  }
+</style>
+
+<body>
+  <nav class="navbar fixed top-0 left-0">
+    <h3 class="text-2xl">Hexashop</h3>
+    <div class="links">
+      <a href="/products">Products</a>
+    </div>
+  </nav>
+
+  <div class="container mt-16">
+    <h3 class="mt-5 ">Shopping Cart</h3>
+    <table class="table table-bordered">
+      <thead class="thead">
+        <tr>
+          <th scope="col">Image</th>
+          <th scope="col">Product Name</th>
+          <th scope="col">Price</th>
+          <th scope="col">Quantity</th>
+          <th scope="col">Total Amount</th>
+          <th scope="col">Remove</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% let totalCartPrice=0; %>
+          <% if (cart && cart.products.length> 0) { %>
+            <% cart.products.forEach(product=> { %>
+              <tr>
+                <td>
+                  <img src="/uploads/<%= product.product.image %>" alt="<%= product.product.title %>"
+                    style="height: 100px; width: 100px;" />
+                </td>
+                <td>
+                  <%= product.product.title %>
+                </td>
+                <td>₹ <%= product.product.price %>
+                </td>
+                <td>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <button class="btn btn-outline-secondary" type="button"
+                        onclick="updateQuantity('<%= product.product._id %>', -1)"> -
+                      </button>
+                    </div>
+                    <input type="text" class="form-control" value="<%= product.quantity %>" readonly />
+                    <div class="input-group-append">
+                      <button class="btn btn-outline-secondary" type="button"
+                        onclick="updateQuantity('<%= product.product._id %>', 1)"> +
+                      </button>
+                    </div>
+                  </div>
+                </td>
+                <td> ₹ <%= (product.product.price * product.quantity).toFixed(2) %>
+                    <% totalCartPrice +=product.product.price * product.quantity; %>
+                </td>
+                <td>
+                  <form action="/cart/remove" method="POST"
+                    onsubmit="return removeProduct('<%= product.product._id %>', event);">
+                    <input type="hidden" name="productId" value="<%= product.product._id %>" />
+                    <button type="submit" class="btn btn-danger">&times;</button>
+                  </form>
+                </td>
+              </tr>
+              <% }); %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="6" class="text-center">Your cart is empty.</td>
+                  </tr>
+                  <% } %>
+      </tbody>
+    </table>
+    <% if (cart && cart.products.length> 0) { %>
+      <div class="total mt-4">
+        <div class="amt">Total Amount: ₹ <%= totalCartPrice.toFixed(2) %>
+        </div>
+        <a href="#orderSummaryModal"><button class="purchase-btn btn btn-info">Purchase Now </button></a>
+      </div>
+      <% } %>
+  </div>
+
+
+  <!-- Add this section inside your body -->
+  <div id="modals">
+    <!-- Order Summary Modal -->
+    <div id="orderSummaryModal" class="modal" style="display: none;">
+      <div class="modal-content text-center">
+        <h3>Order Summary</h3>
+        <p>Total Amount: ₹ <span id="totalAmount"></span></p>
+        <button class="btn btn-primary" onclick="showOrderConfirmation()">Place Order</button>
+        <button class="btn btn-secondary" onclick="closeModal('orderSummaryModal')">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Order Confirmation Modal -->
+    <div id="orderConfirmationModal" class="modal" style="display: none;">
+      <div class="modal-content text-center">
+        <h3>Order Confirmation</h3>
+        <p>Your order has been placed successfully!</p>
+        <p>Your Order ID is: <span id="orderId"></span></p>
+        <p>Your order will be delivered within 3-5 working days.</p>
+        <p>You can pay ₹<span id="confirmationAmount"></span> on delivery.</p>
+        <button class="btn btn-primary" onclick="showThankYou()">Okay</button>
+      </div>
+    </div>
+
+    <!-- Thank You Modal -->
+    <div id="thankYouModal" class="modal" style="display: none;">
+      <div class="modal-content text-center">
+        <h3>Thank You!</h3>
+        <p>Your order has been successfully placed.</p>
+        <button class="btn btn-primary" onclick="closeModal('thankYouModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Function to handle "Purchase Now" button click
+
+    document.querySelector('.purchase-btn').addEventListener('click', function () {
+      const totalAmount = <%= totalCartPrice.toFixed(2) %> ;
+      document.getElementById('totalAmount').textContent = totalAmount;
+      showModal('orderSummaryModal');
+    });
+
+    // Modal functions
+    function showModal(modalId) {
+      document.getElementById(modalId).style.display = 'block';
+      document.getElementById('modals').classList.add('active');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+      document.getElementById('modals').classList.remove('active');
+    }
+
+    function showOrderConfirmation() {
+      const orderId = Math.floor(100000 + Math.random() * 900000); // Generate random order ID
+      const totalAmount = <%= totalCartPrice.toFixed(2) %> ;
+      document.getElementById('orderId').textContent = orderId;
+      document.getElementById('confirmationAmount').textContent = totalAmount;
+      closeModal('orderSummaryModal');
+      showModal('orderConfirmationModal');
+    }
+
+    function showThankYou() {
+      closeModal('orderConfirmationModal');
+      showModal('thankYouModal');
+    }
+  </script>
+
+
+  <script> // -- update func
+    function updateQuantity(productId, change) {
+      fetch(`/cart/update/${productId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ quantityChange: change }),
+      })
+        .then((data) => { window.location.reload() })
+    }
+    // REMOVE FUNC
+    function removeProduct(productId, event) {
+      event.preventDefault(); // Prevent form from submitting normally
+      fetch("/cart/remove", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", },
+        body: JSON.stringify({ productId: productId }),
+      })
+        .then((data) => { window.location.reload() })
+    }
+  </script>
+
+</body>
+
+
+</html>
