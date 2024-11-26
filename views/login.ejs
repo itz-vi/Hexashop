@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register </title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background-color: #f4f4f9;
+  }
+
+  .container {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .navbar {
+    background-color: #ffffff;
+    height: 60px;
+    padding: 0 52px;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.562);
+  }
+
+  .navbar a {
+    color: rgb(66, 75, 83);
+    margin-left: 20px;
+    font-size: 29px;
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #333333;
+  }
+
+  label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  button {
+    width: 100%;
+    padding: 8px;
+    margin: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+
+  button {
+    background: slateblue;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  button:hover {
+    background: rgb(131, 116, 228);
+  }
+
+  .navbar a {
+    text-decoration: none;
+  }
+</style>
+
+<body>
+
+  <div class="navbar">
+    <a href="#">Hexashop </a>
+    <div>
+      <a href="/">Register</a>
+    </div>
+  </div>
+
+  <div class="container col-md-5 mt-5">
+    <h2>Login </h2>
+    <form action="/login" method="post">
+
+      <label for="email">Email Address</label>
+      <input type="email" name="email" placeholder="Enter your email" required>
+
+      <label for="password">Password</label>
+      <input type="password" name="password" placeholder="Enter your password" required>
+      <button type="submit">Register</button>
+    </form>
+  </div>
+
+</body>
+
+</html>
